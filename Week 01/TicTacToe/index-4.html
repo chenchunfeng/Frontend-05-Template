@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicTacToe</title>
+</head>
+<style>
+    #board {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        min-width: 400px;
+        min-height: 400px;
+    }
+
+    .cell {
+        width: 100px;
+        height: 100px;
+        background-color: green;
+        line-height: 100px;
+        display: inline-block;
+        text-align: center;
+        vertical-align: middle;
+        border: 2px solid white;
+        font-size: 40px;
+        color: red;
+    }
+</style>
+
+<body>
+    <!-- 画个棋盘 -->
+    <div id="board"></div>
+</body>
+<script>
+    {
+        // 1:O   2:X
+        let pattern = [
+            0, 0, 0,
+            0, 0, 0,
+            0, 0, 0
+        ]
+        let color = 1;
+        const enmu = {
+            0: "",
+            1: "O",
+            2: "X"
+        }
+        function show() {
+            let board = document.getElementById('board');
+            board.innerText = ''; //重新绘制
+
+            let len = pattern.length;
+            for (let i = 0; i < len; i++) {
+                let cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.innerText = enmu[pattern[i]];
+                cell.addEventListener('click', () => select(i));
+                board.appendChild(cell);
+
+                // 每隔三个换行
+                if (i % 3 === 2) {
+                    board.appendChild(document.createElement('br'));
+                }
+
+            }
+        }
+        show();
+        // 轮流下
+        function select(i) {
+            pattern[i] = color;
+            if (checkWin(pattern, i)) {
+                alert(enmu[color] + ' is winner!');
+            }
+            color = 3 - color;
+            // color = 2 / color 同样效果
+            show();
+
+            // 预测谁会赢
+            willWin() && console.log(enmu[color] + ' will win');
+        }
+        // 检查是否会赢 注意这个3
+        function checkWin(pattern, index) {
+
+            let row = parseInt(index / 3);
+            let col = index % 3;
+            let hasWIN = false;
+
+            // 行
+            hasWIN = pattern.filter((v, i) => parseInt(i / 3) === row).every(v => v === color);
+            if (hasWIN) {
+                return true;
+            }
+            // 列
+            hasWIN = pattern.filter((v, i) => i % 3 === col).every(v => v === color);
+            if (hasWIN) {
+                return true;
+            }
+            //  左到右斜 行列相等
+            if (col === row) {
+                hasWIN = pattern.filter((v, i) => parseInt(i / 3) === i % 3).every(v => v === color);
+                if (hasWIN) {
+                    return true;
+                }
+            }
+            // 右到左斜 3-1的倍数 行列相加等于 3 - 1
+            if (col + row === 3 - 1) {
+                hasWIN = pattern.filter((v, i) => parseInt(i / 3) + i % 3 === 3 - 1).every(v => v === color);
+                if (hasWIN) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        function clone(obj) {
+            return JSON.parse(JSON.stringify(obj));
+        }
+        function willWin() {
+            let len = pattern.length;
+            for (let i = 0; i < len; i++) {
+                let clonePattern = clone(pattern);
+                if (clonePattern[i] === 0) {
+                    // 假设下这一步
+                    clonePattern[i] = color;
+                    if (checkWin(clonePattern, i)) {
+                        return true;
+                    }
+                }
+
+            }
+
+            return false;
+        }
+    }
+
+</script>
+
+</html>

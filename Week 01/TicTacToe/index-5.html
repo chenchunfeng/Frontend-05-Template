@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicTacToe</title>
+</head>
+<style>
+    #board {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        min-width: 400px;
+        min-height: 400px;
+    }
+
+    .cell {
+        width: 100px;
+        height: 100px;
+        background-color: green;
+        line-height: 100px;
+        display: inline-block;
+        text-align: center;
+        vertical-align: middle;
+        border: 2px solid white;
+        font-size: 40px;
+        color: red;
+    }
+</style>
+
+<body>
+    <!-- 画个棋盘 -->
+    <div id="board"></div>
+</body>
+<script>
+    // 5.添加bestChoice
+    {
+        // 1:O   2:X
+        let pattern = [
+            0, 0, 0,
+            0, 0, 0,
+            0, 0, 0
+        ]
+        let color = 1;
+        const enmu = {
+            0: "",
+            1: "O",
+            2: "X"
+        }
+        function show() {
+            let board = document.getElementById('board');
+            board.innerText = ''; //重新绘制
+
+            let len = pattern.length;
+            for (let i = 0; i < len; i++) {
+                let cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.innerText = enmu[pattern[i]];
+                cell.addEventListener('click', () => userSelect(i));
+                board.appendChild(cell);
+
+                // 每隔三个换行
+                if (i % 3 === 2) {
+                    board.appendChild(document.createElement('br'));
+                }
+
+            }
+        }
+        show();
+        // 轮流下
+        function select(i) {
+            pattern[i] = color;
+            if (checkWin(pattern, color)) {
+                alert(enmu[color] + ' is winner!');
+            }
+            color = 3 - color;
+            // color = 2 / color 同样效果
+            show();
+
+            // 预测谁会赢
+            // willWin(pattern, color) && console.log(enmu[color] + ' will win');
+            console.log(bestChoice(pattern, color));
+        }
+        // 用户下
+        function userSelect(i) {
+            pattern[i] = color;
+            show();
+
+            if (checkWin(pattern, color)) {
+                alert(enmu[color] + ' is winner!');
+                return;
+            }
+
+            color = 3 - color;
+            // 电脑自动下
+            computerSelect();
+        }
+        // 电脑下
+        function computerSelect() {
+            // 找最佳的点
+            let i = bestChoice(pattern, color).point;
+            pattern[i] = color;
+            show();
+
+            if (checkWin(pattern, color)) {
+                alert(enmu[color] + ' is winner!');
+                return;
+            }
+            color = 3 - color;
+        }
+
+        // 检查是否会赢 注意这个3
+        function checkWin(pattern, color) {
+
+            let hasWIN = false;
+
+            // 三行
+            for (let i = 0; i < 3; i++) {
+                let row = i;
+                hasWIN = pattern.filter((v, i) => parseInt(i / 3) === row).every(v => v === color);
+                if (hasWIN) {
+                    return true;
+                }
+            }
+
+            // 三列
+            for (let i = 0; i < 3; i++) {
+                let col = i;
+                hasWIN = pattern.filter((v, i) => i % 3 === col).every(v => v === color);
+                if (hasWIN) {
+                    return true;
+                }
+            }
+
+            //  左到右斜 行列相等
+            hasWIN = pattern.filter((v, i) => parseInt(i / 3) === i % 3).every(v => v === color);
+            if (hasWIN) {
+                return true;
+            }
+
+            // 右到左斜 行列相加等于 3 - 1
+            hasWIN = pattern.filter((v, i) => parseInt(i / 3) + i % 3 === 3 - 1).every(v => v === color);
+            if (hasWIN) {
+                return true;
+            }
+
+            return false;
+        }
+
+        function clone(obj) {
+            return JSON.parse(JSON.stringify(obj));
+            // return Object.create(obj);   // 类似继承 一维数组 一维对象
+        }
+        // 如果能赢，返回其坐标
+        function willWin(pattern, color) {
+            let len = pattern.length;
+            for (let i = 0; i < len; i++) {
+                let clonePattern = clone(pattern);
+                if (clonePattern[i] === 0) {
+                    // 假设下这一步
+                    clonePattern[i] = color;
+                    if (checkWin(clonePattern, color)) {
+                        return i;
+                    }
+                }
+
+            }
+
+            return null;
+        }
+    }
+    // 策略 
+    // 1、我能赢
+    // 2、不能输 别人最好，退我最差 反之 别人差，我即我
+    // point 要下的点下标， result 1 赢 0 平 -1输 
+
+    function bestChoice(pattern, color, deep = 6) {
+        let p = willWin(pattern, color);
+        // 如果能赢直接返回
+        if (p) {
+            return {
+                point: p,
+                result: 1
+            }
+        }
+
+        // 假设最坏情况
+        let result = -2;
+        let point = null;
+        let len = pattern.length;
+        for (let i = 0; i < len; i++) {
+            if (pattern[i] === 0 && deep > 0) {
+                let clonePattern = clone(pattern);
+                // 假设下这一步
+                clonePattern[i] = color;
+                // 对方下
+                let r = bestChoice(clonePattern, 3 - color, deep-1).result;
+                // 不能输
+                if (-r > result) {
+                    point = i;
+                    result = -r;
+                }
+                // win lost
+                if (result === 1) {
+                    break;
+                }
+            }
+
+        }
+
+        return {
+            point: point,
+            result: point ? result : 0
+        }
+    }
+
+</script>
+
+</html>

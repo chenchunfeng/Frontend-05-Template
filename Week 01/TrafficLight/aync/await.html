@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>callback</title>
+    <style type="text/css">
+        .content {
+            display: flex;
+            width: 200px;
+            height: 100px;
+            justify-content: space-around;
+            align-items: center;
+            border: 1px solid black;
+        }
+
+        .red,
+        .green,
+        .yellow {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: gray;
+        }
+
+        .red.active {
+            background-color: red;
+        }
+
+        .green.active {
+            background-color: green;
+        }
+
+        .yellow.active {
+            background-color: yellow;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <div class="light red"></div>
+        <div class="light green"></div>
+        <div class="light yellow"></div>
+    </div>
+</body>
+<script>
+    {
+        function activeLight(className) {
+            let lights = document.getElementsByClassName('light');
+            [].forEach.call(lights, el => {
+                el.classList.remove('active');
+            })
+            document.getElementsByClassName(className)[0].classList.add('active')
+        }
+
+        function sleep(duration) {
+            return new Promise(resolve => {
+                setTimeout(resolve, duration);
+            })
+        }
+
+        async function go() {
+            while (true) {
+                activeLight('red');
+                await sleep(3000);
+                activeLight('green');
+                await sleep(2000);
+                activeLight('yellow');
+                await sleep(1000);
+            }
+
+        };
+        go();
+    }
+
+</script>
+
+</html>
