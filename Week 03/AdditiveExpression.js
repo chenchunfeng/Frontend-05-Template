@@ -45,7 +45,7 @@ for(let token of tokenize('3*2/2 + 3')) {
     }
     
 }
-console.log(MultiplicativeExpression(source));
+console.log(AdditiveExpression(source));
 //  乘除表达式
 function MultiplicativeExpression(source) {
     // 当第一个为数字时，表达式开始

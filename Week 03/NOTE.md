@@ -22,6 +22,12 @@
 
 ![avatar](./add.png)
 
+### Expresstion 把AddicativeExpression添加终结符
 ### 总结
+1. 通过tokenize 解析表达式的的tokenNumber 和 operator 生成 source
+2. MultiplicativeExpresstion 最底层 要把Number 处理成 MultiplicativeExpresstion 再把 MultiplicativeExpresstion + operator（*|/） 合并成新节点 递归处理
+3. AddicativeExpression 要先调用MultiplicativeExpresstion， 把MultiplicativeExpresstion处理成AddicativeExpression再把 AddicativeExpression + operator（+|-） 合并成新节点 递归处理
+4. Expresstion 要先调用AddicativeExpression + EOF 生成新节点
 
-一脸懵逼, 跟着敲
+一脸懵逼, 跟着敲 只能从代码反推产生式原理！！
+https://zhuanlan.zhihu.com/p/112460676  网上找的相关文章（还没消化）
