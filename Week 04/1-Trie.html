@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+<script>
+    // const $ = Symbol('$');
+    class Trie {
+        constructor() {
+            this.root = Object.create(null); // 保存数据的根节点
+        }
+
+        insert(word) {
+            let node = this.root;
+            for (let n of word) {
+                if (!node[n]) {
+                    node[n] = Object.create(null);
+                }
+                node = node[n];
+            }
+            if (!('$' in node)) {
+                node['$'] = 0;
+            }
+            node['$']++;
+        }
+        // 出现最多的字符串
+        most(root) {
+            let mostNum = 0;
+            let mostWord = '';
+
+            function visit(node, word) {
+                if (node['$'] && node['$'] > mostNum) {
+                    mostNum = node['$'];
+                    mostWord = word;
+                }
+                for (let key in node) {
+                    visit(node[key], word + key);
+                }
+            }
+            visit(root || this.root, '');
+        }
+        // 搜索前缀
+        search(keyWord) {
+            let node = JSON.parse(JSON.stringify(this.root));
+            for (let c of keyWord) {
+                node = node[c];
+            }
+            // 遍历拼接再打印结果
+            this.printSearchResult(node, keyWord);
+        }
+
+        printSearchResult(node, perWord) {
+            let traversal = (node, word = '') => {
+                if (node['$']) {
+                    console.log(perWord + word);
+                }
+                for (let key in node) {
+                    traversal(node[key], word + key);
+                }
+            }
+            traversal(node);
+        }
+
+        // 每个字符串出现的频率 参数可传top n, 0 代表全部
+        frequency(str) {
+            let node = this.root;
+            for (let c of str) {
+                if (!node[c]) {
+                    console.log(str + '出现的次数为：0');
+                    break;
+                } else {
+                    node = node[c];
+                }
+                
+            }
+            if (node['$']) {
+                console.log(str + '出现的次数为：' + node['$']);
+            }
+        }
+        // 出现次数top, -1代表全部
+        top(num = -1) {
+
+        }
+
+
+    }
+
+
+    function randomWork(length) {
+        let work = '';
+        for (let i = 1; i <= length; i++) {
+            work += String.fromCharCode(Math.random() * 26 + 'a'.charCodeAt(0));
+        }
+        return work;
+    }
+
+    let hello = new Trie();
+    // hello.insert(randomWork(3));
+    // hello.insert(randomWork(3));
+    for (let i = 1; i <= 10000; i++) {
+        hello.insert(randomWork(Math.ceil((Math.random() * 10))));
+    }
+    hello
+    // hello.search('ab');
+</script>
+
+</html>
