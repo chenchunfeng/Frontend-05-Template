@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    .drag-box {
+        width: 100px;
+        height: 100px;
+        background-color: blue;
+    }
+</style>
+
+<body>
+    <div class="drag-box" id="drag"></div>
+</body>
+<script>
+    let drag = document.getElementById('drag');
+    // 全局保存上次transform的位置
+    let baseX = 0, baseY = 0;
+    drag.addEventListener('mousedown', e => {
+        // 鼠标初始位置
+        let startX = e.clientX, startY = e.clientY;
+        let up = e => {
+            // 保存当前位置
+            baseX = e.clientX - startX + baseX;
+            baseY = e.clientY - startY + baseY;
+            document.removeEventListener('mouseup', up);
+            document.removeEventListener('mousemove', move);
+        }
+        let move = e => {
+            drag.style.transform = `translate(${e.clientX - startX + baseX}px, ${e.clientY - startY + baseY}px)`;
+        }
+        // 这里要使用document 移动太快，可能会移到drag外面
+        document.addEventListener('mousemove', move);
+        document.addEventListener('mouseup', up);
+
+    })
+</script>
+
+</html>

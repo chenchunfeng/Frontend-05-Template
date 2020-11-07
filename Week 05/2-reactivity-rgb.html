@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input type="range" min=0 max=255 value="" id="r">
+    <input type="range" min=0 max=255 value="" id="g">
+    <input type="range" min=0 max=255 value="" id="b">
+    <div id="color" style="width:100px;height:100px"></div>
+
+    <input id="input">
+    <div id="input-show"></div>
+</body>
+<script src="./1-reactivity.js"></script>
+<script>
+    let r = document.getElementById('r');
+    let g = document.getElementById('g');
+    let b = document.getElementById('b');
+    let color = document.getElementById('color');
+   
+
+    let rgb = {
+        r: 100,
+        g: 50,
+        b: 20
+    }
+
+    let rgbProxy = reactive(rgb);
+    // effect(()=>{
+    //     r.value = rgbProxy.r;
+    //     console.log(rgbProxy.r);
+    // })
+    // effect(()=>{
+    //     g.value = rgbProxy.g;
+    //     console.log(rgbProxy.g);
+    // })
+    // effect(()=>{
+    //     b.value = rgbProxy.b;
+    //     console.log(rgbProxy.b);
+
+    // })
+    effect(()=>{
+        color.style.backgroundColor = `rgb(${rgbProxy.r},${rgbProxy.g},${rgbProxy.b})`;
+    })
+
+
+    // 监听表单输入
+    r.addEventListener('input', e => rgbProxy.r = e.target.value );
+    g.addEventListener('input', e => rgbProxy.g = e.target.value );
+    b.addEventListener('input', e => rgbProxy.b = e.target.value );
+
+
+
+
+    let inputObj = {
+        a: ''
+    }
+    let input = document.getElementById('input');
+    let show = document.getElementById('input-show');
+    let inputProxy = reactive(inputObj);
+    effect(()=>{
+        show.innerHTML = inputProxy.a;
+    })
+    input.addEventListener('input', e => inputProxy.a = e.target.value );
+</script>
+</html>
