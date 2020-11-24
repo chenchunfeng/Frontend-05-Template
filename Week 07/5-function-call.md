@@ -77,3 +77,7 @@ __ECMAScript code 是没有generator的__
 上一节说到的装箱转换，会生成一个对象，realm就是它们的原型
 
 ### 尝试找出 JavaScript 引擎里面 Realm 所有的对象，使用一个 JS 数据可视化的框架去做一个可视化
+
+realm 相关文档：https://tc39.es/ecma262/#sec-code-realms
+
+内置对象表格：https://tc39.es/ecma262/#sec-well-known-intrinsic-objects
