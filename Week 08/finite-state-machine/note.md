@@ -146,3 +146,14 @@ console.log(matchAB3('i acb c')); // false
         return end;
     }
 ```
+
+## 状态机 结合 KMP 处理任意pattern
+
+1、kmp 需要把pattern 构造一个数组，记得重复数
+2、通过重复数构建数组 构建状态机
+3、循环匹配状态函数，真到endFun
+
+具体看代码 './kmp-state.js'
+
+## 状态机应用场景？
+1. week-01 红绿灯 TODO
