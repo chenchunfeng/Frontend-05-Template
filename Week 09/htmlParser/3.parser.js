@@ -1,4 +1,5 @@
 
+const { match } = require('assert');
 const css = require('css');  // 处理css tree
 const EOF = Symbol('EOF');
 let currentToken = null;
@@ -16,6 +17,119 @@ function addCSSRules(text) {
     let ast = css.parse(text); // 借助css包解析
     console.log(JSON.stringify(ast, null, "  "));
     rules.push(...ast.stylesheet,rules);
+}
+// 只处理简单选择器
+function computeCSS(element) {
+    console.log(rules);
+    // 构建父元素序列 
+    let elements = stack.splice().reverse();
+
+    if(!element.computedStyle) {
+        element.computedStyle = {}; //可以保存其它信息
+    }
+
+    for(let rule of rules) {
+        // 从右到左
+        let selectorParts = rule.selector[0].split(' ').reverse();
+        
+        if(!match(element, selectorParts[0])) {
+            continue;   // 规则跟元素匹配不上
+        }
+
+        let matched = false;
+        // 双循环选择器
+        let j = 1;
+        for(let i = 0; i < elements.length; i++) {
+            if(match(elements[i], selectorParts[j])) {
+                j++;
+            }
+
+            if(j <= selectorParts.length) {
+                matched = ture;
+            }
+
+            if(matched) {
+                console.log('完成匹配');
+                let sp = specificity(rule.selectors[0]);
+                //这个时候就要把样式追回到元素上上面了 
+                let computedStyle = element.computedStyle;
+                for(let declaration of rule.declarations) {
+                    if(!computedStyle[declaration.property]) {
+                        computedStyle[declaration.property] = {};
+                    }
+                    // 没有优化级
+                    if(!computedStyle[declaration.property].specificity) {
+                        computedStyle[declaration.property].value = declaration.value;
+                        computedStyle[declaration.property].specificity = sp;
+                    } else if (compare(computedStyle[declaration.property].specificity, sp)) {
+                        // 与上一次的权重比较，再确定保存value
+                        computedStyle[declaration.property].value = declaration.value;
+                        computedStyle[declaration.property].specificity = sp;
+                    }                } 
+
+            }
+        }
+
+    }
+}
+// 记录优先级
+function specificity(selector) {
+    // 空格打散成数组 循环判断开头字母
+    let p = [0,0,0,0];
+    let selectorParts = selector.split(' ');
+    for(let part of selectorParts) {
+        if(part.charAt(0) === '#') {
+            p[1] +=1;
+            continue;
+        }
+        if(part.charAt(0) === '.') {
+            p[2] +=1;
+            continue;
+        }
+        p[3] +=1;
+    }
+    return p
+}
+
+// 比较优先级  只有前面的相等为零，才会走下一们
+function compare(p1, p2) {
+    if(p1[0] - p2[0]) {
+        return p1[0] - p2[0];
+    }
+    if(p1[1] - p2[1]) {
+        return p1[1] - p2[1];
+    }
+    if(p1[2] - p2[2]) {
+        return p1[2] - p2[2];
+    }
+
+    return p1[3] - p2[3];
+    
+}
+function match(element, selector) {
+    if(!selector || !element.attributes) {
+        return false;
+    }
+    // id选择器
+    if (selector.charAt(0) === '#') {
+        let attr = element.attributes.filter(attr => attr.name === 'id')[0];
+        if(attr && attr.vlaue === selector.replace('#', '')) {
+            return ture;
+        }
+    }
+    // class 选择器
+    if (selector.charAt(0) === '.') {
+        let attr = element.attributes.filter(attr => attr.name === 'class')[0];
+        if(attr && attr.value.split(' ').indexOf(selector.replace('.', '')) >= 0) {
+            return ture;
+        }
+    }
+    // 标签 选择器
+    if (element.tagName === selector) {
+        return ture;
+    }
+
+    return false;
 }
 
 // 构建dom树
@@ -37,6 +151,8 @@ function emit(token) {
                 })
             }
         }
+        // 创建标签时调用css计算
+        computeCSS(element);
         top.children.push(element);
         if(!token.isSelfClosing) {
             stack.push(element);
