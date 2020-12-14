@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+<script>
+    // class Light {
+    //     constructor() {
+    //         this.state = 'on';
+    //         this.button = null;
+    //     }
+    //     // 创建开关，并绑定点击事件
+    //     init() {
+    //         let button = document.createElement('button');
+    //         button.innerText = '开关';
+    //         this.button = document.body.appendChild(button);
+    //         this.button.onclick = () => {
+    //             this.buttonWasPressed();
+    //         }
+    //     }
+
+    //     buttonWasPressed() {
+    //         if(this.state === 'on') {
+    //             console.log('开灯');
+    //             this.state = 'off';
+    //         } else {
+    //             console.log('关灯');
+    //             this.state = 'on';
+    //         }
+    //     }
+    // }
+
+    // new Light().init();
+    // class State {
+    //     constructor(light) {
+    //         this.light = light;
+    //     }
+
+    //     buttonWasPressed() {
+    //         throw Error('小兄弟，记得定义下状态类里面的行为方法');
+    //     }
+
+    // }
+    // // 状态 关
+    // class StateOff extends State {
+    //     constructor(light) {
+    //         super(light);
+    //     }
+
+    //     buttonWasPressed() {
+    //         console.log('弱光');
+    //         this.light.currentState = 'StateWeak';
+    //     }
+    // }
+    // // 状态 弱
+    // class StateWeak extends State {
+    //     constructor(light) {
+    //         super(light);
+    //     }
+
+    //     buttonWasPressed() {
+    //         console.log('强光');
+    //         this.light.currentState = 'StateStrong';
+    //     }
+    // }
+    // // 状态 强
+    // class StateStrong extends State {
+    //     constructor(light) {
+    //         super(light);
+    //     }
+
+    //     buttonWasPressed() {
+    //         console.log('关');
+    //         this.light.currentState = 'StateOff';
+    //     }
+    // }
+    // class Light {
+    //     constructor() {
+    //         this.currentState = 'StateOff';
+    //         this.button = null;
+
+    //         // 三个状态
+    //         this.StateOff = new StateOff(this);
+    //         this.StateWeak = new StateWeak(this);
+    //         this.StateStrong = new StateStrong(this);
+    //     }
+    //     // 创建开关，并绑定点击事件
+    //     init() {
+    //         let button = document.createElement('button');
+    //         button.innerText = '开关';
+    //         this.button = document.body.appendChild(button);
+    //         this.button.onclick = () => {
+    //             // 调用状态类里面的行为
+    //             this[this.currentState].buttonWasPressed();
+    //         }
+    //     }
+    // }
+
+    // new Light().init();
+
+
+    class Light {
+        constructor() {
+            this.state = FSM.offState;
+            this.button = null;
+        }
+        // 创建开关，并绑定点击事件
+        init() {
+            let button = document.createElement('button');
+            button.innerText = '点我开灯';
+            this.button = document.body.appendChild(button);
+            this.button.onclick = () => {
+                this.state();
+            }
+        }
+    }
+    // 注意不要使用箭头函数了，要不然fsm的this就是window
+    let FSM = {
+        offState: function() {
+            console.log('弱');
+            this.button.innerText = '点我超级亮';
+            this.state = FSM.weakState;
+
+        },
+        weakState:  function() {
+            console.log('强');
+            this.button.innerText = '点我关灯';
+            this.state = FSM.strongState;
+        },
+        strongState: function() {
+            console.log('关');
+            this.button.innerText = '点我开灯';
+            this.state = FSM.offState;
+        } 
+    }
+
+    new Light().init();
+</script>
+</html>

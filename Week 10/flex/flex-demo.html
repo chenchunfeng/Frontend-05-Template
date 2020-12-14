@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>demo</title>
+    <style>
+        .flex-1 {
+            width: 300px;
+            border: 1px solid red;
+            display: flex;
+        }
+        .flex-1 > div {
+            border: 1px solid black;
+            flex: 1;
+            text-align: center;
+            
+        }
+        .flex-auto {
+            width: 100px;
+            border: 1px solid red;
+            display: flex;
+        }
+        .flex-auto > div {
+            border: 1px solid black;
+            /* flex: auto; */
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="flex-1">
+        <div>1231212</div>
+        <div>1234567890</div>
+        <div>111</div>
+        <div>1212</div>
+    </div>
+    <div class="flex-auto">
+        <div style="width: 50px;">1234</div>
+        <div style="width: 50px;">123456789</div>
+        <div>111</div>
+        <div>1212</div>
+    </div>
+</body>
+<script>
+</script>
+</html>
