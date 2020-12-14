@@ -147,4 +147,29 @@ crossSpace = 0;
 
 ### 五、渲染单个元素
 
+为了简化过程，node环境下使用images库将dom元素绘制到图片，这样可以避免安装大量的C++
+
+.fill(red, green, blue[, alpha])
+eg:images(200, 100).fill(0xff, 0x00, 0x00, 0.5) Fill image with color
+以指定颜色填充图像
+
+
+### 五、渲染dom树
+
+递归调用render
+
+
+### 最后再贴个流程图吧
+
+![avatar](./images/step.png)
+- 输入url http response返回
+- parser response 形成dom树
+- 收集css 计算优先级 再把样式挂在dom树上
+- layout 布局 计算每个元素的位置
+- render 渲染，使用images 递归绘制每个元素的位置及其背影色
+
+
+
+
+
 

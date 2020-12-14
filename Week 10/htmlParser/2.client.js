@@ -1,5 +1,6 @@
-const net = require('net');
+const images = require('images');
 const net = require('./3.parser.js');
+const render = require('./5.render.js');
 
 class Request {
     constructor(options) {
@@ -256,4 +257,8 @@ void async function() {
     console.log(response);
     // 把html解析成dom
     let dom = parser.parseHTML(response.body);
+
+    let viewport = images(800, 600);
+    render(viewport, dom);
+    viewport.save('toy-browser.jpg');
 }
