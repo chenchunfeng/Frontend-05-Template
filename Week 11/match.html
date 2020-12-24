@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>match</title>
+</head>
+
+<body>
+    <div class="a b" id="hello">
+        <h1 class="c" id="h1">我是谁</h1>
+    </div>
+    <span class="s p">
+        <div class="span-div">
+            <h2 id="whoami" class="1 2">我从哪里来</h2>
+        </div>
+    </span>
+</body>
+<script>
+    function match(selector, element) {
+        // 使用空格拆分 从右到左解析
+        let selectors = selector.split(' ').reverse();
+        if (selectors.lenght === 0) {
+            return false;
+        }
+        let parsedSelectors = [];
+
+        // 全部子项匹配上才叫匹配
+        return selectors.every( (item, index) => {
+            console.log(index);
+            // 复杂选择器转为复合选择器
+            return matchItem(handleCompoundSelector(item), element, index);
+        })
+    }
+    // 循环节点，判断其是否匹配
+    function matchItem(selectorObj, element, index) {
+        let target = element;
+
+        // 只需要判断当前节点
+        if (index === 0) {
+            return matchOneToOne(selectorObj, target);
+        } else {
+            // 需要循环判断父级 匹配 需要确实从哪一级起
+            let i = 0;
+            do {
+                if (i >= index) {
+                    // 父级有一个匹配成功就退出循环
+                    if(matchOneToOne(selectorObj, target)) {
+                        return true;
+                    }
+
+                }
+                target = target.parentNode;
+                i++;
+
+            } while(target.parentNode);
+            // 匹配到顶都匹配不上
+            return false;
+        }
+    }
+    // 判断 节点的tagName classList id是否相等
+    function  matchOneToOne(selectorObj, element) {
+        if (selectorObj._id && selectorObj._id !== element.id) {
+            return false;
+        }
+        if (selectorObj._tagName && selectorObj._tagName !== element.tagName.toLowerCase()) {
+            return false;
+        }
+        if (selectorObj._classList && selectorObj._classList.length > 0) {
+            return selectorObj._classList.every(item => [...element.classList].includes(item));
+        }
+
+        return true;
+    }
+    // 把复合选择器中的简单选择进行提取
+    // compoundSelector: 'div.a.b#test'
+    // @return {_classList: ['a', 'b'], _id: 'test', _tagName: 'div'}
+    function handleCompoundSelector(compoundSelector) {
+        //写最前面的一定是* 或tagname, 先不考虑*   \w == [A-Za-z0-9_]
+        let arr = compoundSelector.match(/(\w+)|(\.\w+)|(\#\w+)/g);
+        let _classList = [];
+        let _id = null;
+        let _tagName = null;
+        for(let i in arr) {
+            switch(arr[i][0]) {
+                case '.': _classList.push(arr[i].substring(1)); break;
+                case '#': _id = arr[i].substring(1); break;
+                default: _tagName = arr[i].toLowerCase();
+            }
+        }
+
+        return { _classList, _id, _tagName};
+
+
+        // 也可以用状态机实现
+
+
+    }
+
+
+
+    console.log(match('SPAN h2#whoami.1.2', document.getElementById('whoami')));
+    console.log(match('#hello #h1.c.b', document.getElementById('h1')));
+</script>
+
+</html>
