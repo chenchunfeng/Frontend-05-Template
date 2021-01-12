@@ -1,5 +1,4 @@
-
-function createElement(type, attributes, ...children) {
+export function createElement(type, attributes, ...children) {
     let element;
     // 判断是否为原生标签
     if(typeof type === 'string') {
@@ -24,9 +23,9 @@ function createElement(type, attributes, ...children) {
     return element;
 }
 
-class MyComponent {
+export class Component {
     constructor() {
-        this.root = document.createElement('div');
+        // this.root = this.render();
     }
     setAttribute(name, value) {
         this.root.setAttribute(name, value);
@@ -38,41 +37,14 @@ class MyComponent {
         parent.appendChild(this.root);
     }
 }
-
-class ElementWrapper {
+class ElementWrapper extends Component{
     constructor(type) {
         this.root = document.createElement(type);
     }
-    setAttribute(name, value) {
-        this.root.setAttribute(name, value);
-    }
-    appendChild(child) {
-        child.mountTo(this.root);
-    }
-    mountTo(parent) {
-        parent.appendChild(this.root);
-    }
 }
 
-class TextWrapper {
+class TextWrapper extends Component{
     constructor(type) {
         this.root = document.createTextNode(type);
     }
-    setAttribute(name, value) {
-        this.root.setAttribute(name, value);
-    }
-    appendChild(child) {
-        child.mountTo(this.root);
-    }
-    mountTo(parent) {
-        parent.appendChild(this.root);
-    }
 }
-let a = <MyComponent id="a">
-        <span>1</span>
-        <span>2</span>
-        <span>3</span>
-    </MyComponent>
-
-// document.body.appendChild(a);
-a.mountTo(document.body);
