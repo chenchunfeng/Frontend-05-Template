@@ -61,28 +61,27 @@ class Carousel extends Component {
             let move = e => {
                 //clienY clienX 在可视区域的位置
                 x = e.clientX - startX;
-                // for(let child of children) {
-                //     child.style.transition = 'none';
-                //     child.style.transform = `translateX(${position * 500 + x}px)`;
-                // }
 
                 //  只需要处理 当前 前后 三张图片
                 for(let offset of [-1, 0, 1]) {
                     // 把负数处成下标数, 偏移值 加 长度 再对其长度取余
-                    let index = (offset + children.length) % children.length;
+                    let index = (offset + children.length + position) % children.length;
                     children[index].style.transition = 'none';
-                    children[index].style.transform = `translateX(${- position * 500 * offset + x}px)`;
-                } 
+                    children[index].style.transform = `translateX(${(-index + offset )* 500  + x}px)`;
+                }
 
             }
             let up = e => {
                 // 记录位置
-                position = position + Math.round( x / 500); // 每张图宽500
-                // for(let child of children) {
-                //     //恢复动画
-                //     child.style.transition = '';
-                //     child.style.transform = `translateX(${position * 500}px)`;
-                // }
+                position = position - Math.round( x / 500); // 每张图宽500
+                //  只需要处理 x 如果大于零 右滑
+                for(let offset of [0, - Math.sign(Math.round(x / 500) - x + 250 * Math.sign(x))]) {
+                    // 把负数处成下标数, 偏移值 加 长度 再对其长度取余
+                    let index = (position +  offset + children.length) % children.length;
+                    console.log(index);
+                    children[index].style.transition = '';
+                    children[index].style.transform = `translateX(${(-index + offset )* 500}px)`;
+                }
                 document.removeEventListener('mouseup', up);
                 document.removeEventListener('mousemove', move);
             }
