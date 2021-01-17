@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .div-demo {
+            width: 100px;
+            height: 100px;
+            background-color: blue;
+        }
+        .div-demo2 {
+            width: 100px;
+            height: 100px;
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <div class="div-demo" id="div">js</div>
+    <div class="div-demo2" id="div2">css</div>
+    <button id="start">start</button>
+    <button id="pause">pause</button>
+    <button id="resume">resume</button>
+    <button id="reset">reset</button>
+</body>
+    <script type="module">
+        import { Timeline, Animation } from './animation.js';
+        import { linear, ease, easeIn, easeOut, easeInOut } from './timingfunction.js';
+
+        let t = new Timeline();
+        t.add(new Animation({
+            object: document.getElementById('div').style,
+            property: 'transform',
+            startValue: 0,
+            endValue: 800,
+            duration: 3000,
+            // delay: 1000,
+            timingFunc: ease,
+            template: v =>`translateX(${v}px)`
+        }))
+
+        
+        document.getElementById('pause').addEventListener('click', e => {
+            t.pause();
+        })
+        document.getElementById('start').addEventListener('click', e => {
+            t.start();
+            document.querySelector('#div2').style.transition = '3s ease';
+            document.querySelector('#div2').style.transform = 'translateX(800px)';
+        })
+        document.getElementById('resume').addEventListener('click', e => {
+            t.resume();
+        })
+        document.getElementById('reset').addEventListener('click', e => {
+            t.reset();
+        })
+    </script>
+</html>
