@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body oncontextmenu="event.preventDefault()">
+    
+</body>
+<script>
+    document.documentElement.addEventListener('tap', e => {
+        console.log('tap', e);
+    })
+    {
+        // let element = document.documentElement;
+        // element.addEventListener('mousedown', (e) => {
+        //     let move = (e) => {
+        //         console.log('move', e);
+        //     }
+        //     let up = (e) => {
+        //         console.log('up', e);
+        //         document.removeEventListener('mousemove', move);
+        //         document.removeEventListener('mouseup', up);
+        //     }
+        //     document.addEventListener('mousemove', move);
+        //     document.addEventListener('mouseup', up)
+        // })
+    }
+
+    {
+        let element = document.documentElement;
+        // 保存touchstart 创建的context
+        let contexts = new Map();
+
+        
+        element.addEventListener('touchstart', e => {
+            for(let touch of e.changedTouches) {
+                // 创建context传入 并以identifier做key保存，在move end 中使用
+                let context = Object.create(null);
+                contexts.set(touch.identifier, context);
+                start(touch, context);
+            }
+        })
+        element.addEventListener('touchmove', e => {
+            for(let touch of e.changedTouches) {
+                move(touch, contexts.get(touch.identifier));
+            }
+        })
+        element.addEventListener('touchend', e => {
+            for(let touch of e.changedTouches) {
+                end(touch, contexts.get(touch.identifier));
+            }
+        })
+        element.addEventListener('touchcancel', e => {
+            for(let touch of e.changedTouches) {
+                cancel(touch, contexts.get(touch.identifier));
+            }
+        })
+        // let handler, startX, startY;
+        // // 默认为tap
+        // let isPan = false, isPress = false; isTap = true;
+        let start = (point, context) => {
+            // 初始化
+            context.isPan = false;
+            context.isTap = true;
+            context.isPress = false;
+            // flick: 收集点，用于计算移动速度
+            context.points = [{
+                t: Date.now(),
+                x: point.clientX,
+                y: point.clientY
+            }];
+
+
+            // 1. 500ms 无其它操作则为长按press
+            context.handler = setTimeout(() => {
+                context.isPan = false;
+                context.isTap = false;
+                context.isPress = true;
+                context.handler = null
+                console.log('press');
+            }, 500);
+            // 2. 保存startX startY 计算移动距离使用
+            context.startX = point.clientX;
+            context.startY = point.clientY;
+        }
+        let move = (point, context) => {
+            // 3. 计算距离是否大于10px 为了省开方 直接用100比较  
+            let dx = point.clientX - context.startX;
+            let dy = point.clientY - context.startY;
+            // 移动可能是来回移动的，标识后pan不需要再判断
+            if (!context.isPan && dx ** 2 + dy ** 2 > 100) {
+                context.isPan = true;
+                context.isTap = false;
+                context.isPress = false;
+                clearTimeout(context.handler);
+                console.log('panstart');
+            }
+            if (context.isPan) {
+                console.log('pan');
+            }
+            // console.log('move', point);
+            // flick 精化部分 只保留500ms内移动的点
+            // 刚开始还在思考来回移动时的速度很快，但计算出来的速度就慢问题。但从业务角度考虑，来回划，是不会触发flick才对
+            context.points = context.points.filter(point => Date.now() - point.t < 500);
+            context.points.push({
+                t: Date.now(),
+                x: point.clientX,
+                y: point.clientY
+            });
+        }
+        let end = (point, context) => {
+            // console.log('end', point);
+            if (context.isTap) {
+                console.log('tap');
+                dispatch('tap', {
+                    test: 1231
+                })
+                clearTimeout(context.handler);
+            }
+            if (context.isPan) {
+                console.log('panend');
+            }
+            if (context.isPress) {
+                console.log('pressend');
+            }
+
+            // flick 最后计算速度
+            context.points = context.points.filter(point => Date.now() - point.t < 500);
+            let v;
+            if (context.points.length === 0) {
+                v = 0;
+            } else {
+                let d = Math.sqrt((point.clientX - context.points[0].x) ** 2 + (point.clientY - context.points[0].y) ** 2 );
+                v = d / (Date.now() - context.points[0].t);
+            }
+            
+            if (v > 1.5) {
+                // 1.5 像素每毫秒
+                console.log('flick');
+                context.isFlick = true;
+            } else {
+                context.isFlick = false;
+            }
+            console.log(v);
+
+            // 恢复默认, 要不然就再点状态就错了
+            contexts.delete(point.identifier);
+            // handler = null;
+            // isPan = false;
+            // isTap = true;
+            // isPress = false;
+        }
+        let cnacel = (point, context) => {
+            clearTimeout(context.handler);
+            // 恢复默认, 要不然就再点状态就错了
+            contexts.delete(point.identifier);
+            // handler = null;
+            // isPan = false;
+            // isTap = true;
+            // isPress = false;
+            console.log('cnacel', point);
+        }
+
+
+        function dispatch(type, properties) {
+            let event = new Event(type);
+            for(let name in properties) {
+                event[name] = properties[name];
+            }
+            element.dispatchEvent(event);
+        }
+    }
+
+    
+</script>
+</html>
