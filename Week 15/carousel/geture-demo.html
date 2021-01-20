@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
-<body oncontextmenu="event.preventDefault()">
+<body oncontextmenu="event.preventDefault()" style="width: 100vw;height: 100vh;">
     
 </body>
 <script>
@@ -13,25 +13,65 @@
         console.log('tap', e);
     })
     {
-        // let element = document.documentElement;
-        // element.addEventListener('mousedown', (e) => {
-        //     let move = (e) => {
-        //         console.log('move', e);
-        //     }
-        //     let up = (e) => {
-        //         console.log('up', e);
-        //         document.removeEventListener('mousemove', move);
-        //         document.removeEventListener('mouseup', up);
-        //     }
-        //     document.addEventListener('mousemove', move);
-        //     document.addEventListener('mouseup', up)
-        // })
-    }
-
-    {
         let element = document.documentElement;
-        // 保存touchstart 创建的context
         let contexts = new Map();
+        let isListeningMouse = false;
+
+        element.addEventListener('mousedown', (e) => {
+            let context = Object.create(null);
+            // 移位才能对应mousemove.buttons的值
+            contexts.set('mouse' + (1 << e.button), context);
+            start(e, context);
+            // console.log('mousedown', e);
+            let mousemove = (e) => {
+                // console.log('mousemove', e);
+                let button = 1;
+                while(button <= e.buttons) {
+                    if (button & e.buttons) {
+                        let key = button;
+                        // 中间与右键相反
+                        if (button === 2) {
+                            key = 4;
+                        }
+                        if (button === 4) {
+                            key = 2;
+                        }
+                        
+                        let context = contexts.get('mouse' + key);
+                        move(e, context);
+                    }
+
+                    button = button << 1;
+
+                }
+
+            }
+            let mouseup = (e) => {
+                // console.log('mouseup', e);
+                let context = contexts.get('mouse' + (1 << e.button));
+                end(e, context);
+                contexts.delete('mouse' + (1 << e.button));
+                // 没有按键按下
+                if (event.buttons === 0) {
+                    document.removeEventListener('mousemove', mousemove);
+                    document.removeEventListener('mouseup', mouseup);
+                    isListeningMouse = false;
+                }
+            }
+            // 只监听一次就够            
+            if (!isListeningMouse) {
+                document.addEventListener('mousemove', mousemove);
+                document.addEventListener('mouseup', mouseup);
+                isListeningMouse = true;
+            }
+
+        })
+    // }
+
+    // {
+    //     let element = document.documentElement;
+    //     // 保存touchstart 创建的context
+    //     let contexts = new Map();
 
         
         element.addEventListener('touchstart', e => {
