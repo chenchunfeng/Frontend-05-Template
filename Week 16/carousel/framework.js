@@ -11,14 +11,25 @@ export function createElement(type, attributes, ...children) {
     for (let name in attributes) {
         element.setAttribute(name, attributes[name]);
     }
-    // 子节点
-    for (let child of children) {
-        if (typeof child === "string") {
-            child = new TextWrapper(child);
-        }
 
-        element.appendChild(child);
+    let processChildren = (children) => {
+        // 子节点
+        for (let child of children) {
+            if ((typeof child === 'object') && (child instanceof Array)) {
+                // 子节点递归处理
+                processChildren(child);
+                continue;
+            }
+            if (typeof child === "string") {
+                child = new TextWrapper(child);
+            }
+
+            element.appendChild(child);
+        }
     }
+
+    processChildren(children);
+
 
     return element;
 }
@@ -58,6 +69,9 @@ class ElementWrapper extends Component {
     constructor(type) {
         super();
         this.root = document.createElement(type);
+    }
+    setAttribute(name, value) {
+        this.root[name] = value;
     }
 }
 
