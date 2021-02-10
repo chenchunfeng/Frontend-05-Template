@@ -35,3 +35,14 @@ https://www.npmjs.com/package/babel-plugin-istanbul
 
 #### code coverage  html-parse
 #### 把测试加入generator-vue中
+
+
+--- 
+
+工具链总结
+
+1. 使用yeoman 初始化项目模版， 充当一个脚手架工具
+2. 使用mocha 实现代码单元测试
+3. 使用nyc 处理测试覆盖率 code coverage
+4. 在yeoman上集成上面功能。
+
