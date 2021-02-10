@@ -42,6 +42,7 @@ module.exports = class extends Generator {
       'vue-loader',
       'vue-template-compiler',
       'css-loader',
+      'babel-loader',
       'vue-style-loader',
       'copy-webpack-plugin',
       'mocha',
